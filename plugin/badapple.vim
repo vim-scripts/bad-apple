@@ -14,17 +14,12 @@ function! s:Build2DArray(n,m,v)
 endfunction
 
 
-let s:ct=0
+let s:grey=['#','o','.',' ']
 function! s:PrintMap(change)
-	let s:ct=s:ct+1
 	for p in a:change
 		let i=p[0]
 		let j=p[1]
-		if s:map[i][j]==' '
-			let s:map[i][j]='#'
-		else
-			let s:map[i][j]=' '
-		endif
+		let s:map[i][j]=s:grey[p[2]]
 	endfor
 	for i in range(1,s:R)
 		let s=join(s:map[i-1],"")
@@ -34,8 +29,15 @@ function! s:PrintMap(change)
 endfunction
 
 function! s:Initialize()
-	let s:R=30
-	let s:C=50
+	let s:R=48
+	let s:C=64
+	set go-=T
+	if has("win32")
+		set guifont=Terminal:h9
+	else
+	     	set guifont=Free\ Mono\ 8
+	endif
+	:res 50
 	let s:map=s:Build2DArray(s:R,s:C,'#')
 	call s:PrintMap([])
 endfunction
@@ -47,10 +49,9 @@ function! s:Start()
 			call add(change,split(p,","))
 		endfor
 		call s:PrintMap(change)
-		sleep 30m
 		redraw
+		sleep 40m
 	endfor
 endfunction
-
 call s:Initialize()
 call s:Start()
