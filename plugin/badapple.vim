@@ -14,23 +14,23 @@ function! s:Build2DArray(n,m,v)
 endfunction
 
 
-let s:grey=['#','o','.',' ']
 function! s:PrintMap(change)
 	for p in a:change
-		let i=p[0]
-		let j=p[1]
-		let s:map[i][j]=s:grey[p[2]]
+		let i=p[0]-1
+		let j=p[1]-1
+		let s:map[i][j]=p[2]
 	endfor
 	for i in range(1,s:R)
 		let s=join(s:map[i-1],"")
-		let s=substitute(s,".","&&","g")
 		call setline(i,s)
 	endfor
 endfunction
 
 function! s:Initialize()
-	let s:R=48
-	let s:C=64
+	let firstLine=split(s:data[0],' ')
+	let s:R=firstLine[0]
+	let s:C=firstLine[1]
+	let s:sleepTime=1000/firstLine[2]
 	set go-=T
 	if has("win32")
 		set guifont=Terminal:h9
@@ -38,19 +38,15 @@ function! s:Initialize()
 	     	set guifont=Free\ Mono\ 8
 	endif
 	:res 50
-	let s:map=s:Build2DArray(s:R,s:C,'#')
+	let s:map=s:Build2DArray(s:R,s:C,' ')
 	call s:PrintMap([])
 endfunction
 
 function! s:Start()
-	for line in s:data
-		let change=[]
-		for p in split(line," ")
-			call add(change,split(p,","))
-		endfor
-		call s:PrintMap(change)
+	for line in s:data[1:]
+		call s:PrintMap(map(split(line,"|"),"split(v:val,'_')"))
 		redraw
-		sleep 40m
+		sleep 70m
 	endfor
 endfunction
 call s:Initialize()
